@@ -17,5 +17,3 @@ INVADER_IDLENESS=2      # Bullet steps per invader step
 INVADER_DENSITY=0.15    # Probability of new invaders per step
 BOMB_DENSITY=0.05       # Probability of dropped bombs per invader per step
 </code></pre>
-
-https://github.com/deverw/Space-Invaders/blob/main/space-invaders-demo.mp4
