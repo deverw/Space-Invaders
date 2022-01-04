@@ -18,6 +18,4 @@ INVADER_DENSITY=0.15    # Probability of new invaders per step
 BOMB_DENSITY=0.05       # Probability of dropped bombs per invader per step
 </code></pre>
 
-<video width="320" height="240" controls>
-  <source src="space-invaders-demo.mp4" type="video/mp4">
-</video>
+https://github.com/deverw/Space-Invaders/blob/main/space-invaders-demo.mp4
