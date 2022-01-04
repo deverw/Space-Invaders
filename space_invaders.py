@@ -6,16 +6,21 @@ from random import random
 RED=(255,0,0)
 GREEN=(0,255,0)
 BLUE=(0,0,255)
+YELLOW=(127,127,0)
 WHITE=(255,255,255)
 
 # Game parameters
 SPEED=10.0              # Frames per second (=speed of bullets)
-BULLET_LIMIT=2          # Maximum number of concurrent bullets
+BULLET_LIMIT=3          # Maximum number of concurrent bullets
 INVADER_IDLENESS=2      # Bullet steps per invader step
-INVADER_DENSITY=0.15    # Probability of new invaders
+INVADER_DENSITY=0.15    # Probability of new invaders per step
+BOMB_DENSITY=0.05       # Probability of dropped bombs per invader per step
 
 def clamp(value, min_value=0, max_value=7):
     return min(max_value, max(min_value, value))
+
+def do_nothing(self):
+    pass
 
 class Game:
     def __init__(self):
@@ -24,19 +29,9 @@ class Game:
         self.tick=0
         self.base=self.Base(3)
         self.invaders=[]
+        self.bombs=[]
 
     def action(self):
-        # handle invaders
-        if (self.tick%INVADER_IDLENESS)==0:
-            # create invaders
-            if random()>0.8:
-                self.invaders.append(self.Invader(0,0))
-            for i in self.invaders:
-                i.move()
-                # Game over if invader reaches bottom line
-                if i.y>6:
-                    self.alive=False    
-
         # handle bullets
         for b in self.base.bullets:
             b.move()
@@ -47,9 +42,34 @@ class Game:
                     self.invaders.remove(i)
                     self.base.bullets.remove(b)
                     self.score+=1
-            # remove missed bullets
+            # remove misguided bullets
             if b.y<0:
                 self.base.bullets.remove(b)
+
+        # handle invaders and bombs
+        if (self.tick%INVADER_IDLENESS)==0:
+            # create invaders
+            if random()>(1-INVADER_DENSITY):
+                self.invaders.append(self.Invader(0,0))
+            for i in self.invaders:
+                # create bombs
+                if random()>(1-BOMB_DENSITY):
+                    self.bombs.append(self.Bomb(i.x,i.y))
+                i.move()
+                # Game over if invader reaches bottom line
+                if i.y>6:
+                    self.alive=False   
+            # drop bombs
+            for o in self.bombs:
+                o.move()
+                # remove misguided bombs
+                if o.y>7:
+                    self.bombs.remove(o)
+                # Game over if base is hit
+                if (o.y==7) and (o.x==self.base.x):
+                    o.explode()
+                    self.alive=False
+
         self.refresh_display()
     
     def refresh_display(self):
@@ -59,9 +79,11 @@ class Game:
             i.display()
         for b in self.base.bullets:
             b.display()
+        for o in self.bombs:
+            o.display()
     
     def over(self):
-        hat.stick.direction_any = self.base.fire        # don't disturb message display after game over
+        hat.stick.direction_any = do_nothing      # don't disturb message display after game over
         hat.show_message("Game Over!", text_colour=RED)
         hat.show_message("Score: %s" % self.score, text_colour=GREEN)
 
@@ -106,7 +128,6 @@ class Game:
             self.x=x
             self.y=y
             self.direction=1
-            self.alive=True
 
         def move(self):
             # move back and forth, get lower after each line
@@ -119,6 +140,20 @@ class Game:
         def display(self):
             hat.set_pixel(self.x, self.y, RED)
 
+    class Bomb:
+        def __init__(self,x,y):
+            self.x=x
+            self.y=y
+
+        def move(self):
+            self.y+=1
+            
+        def display(self):
+            hat.set_pixel(self.x, self.y, YELLOW)
+
+        def explode(self):
+            hat.set_pixel(self.x, self.y, WHITE)
+            sleep (2/SPEED)
 
 # create objects
 hat = SenseHat()
