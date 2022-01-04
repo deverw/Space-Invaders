@@ -3,6 +3,9 @@
 This is a game for Raspberry Pi with a Sense Hat extension, implemented in Python.
 Invaders (red dots) enter your space, drop bombs (yellow dots) and move their way towards your base (green dot). You can move your base left and right and shoot at invaders using the joystick. Bombs cannot be eliminated, so you have to avoid them by moving.
 Make sure you don't get hit by a bomb and no invader reaches the surface of your planet!
+<p align="center">
+	<img src="space-invaders-demo.gif" alt="Space Invaders Demo">
+</p>
 
 Execution:<br>
 <code>
